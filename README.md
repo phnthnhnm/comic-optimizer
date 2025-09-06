@@ -11,9 +11,9 @@ Comic Optimizer is a modern, user-friendly tool for optimizing comic book archiv
 
 ## Requirements
 
-- **pingo** v1.24.2+ (must be installed and available in your system PATH)
+- **[pingo](https://css-ig.net/pingo)** v1.24.2+ (must be installed and available in your system PATH)
 - **Python** 3.13+ (if running from source)
-- **uv** (if running from source; for dependency management)
+- **[uv](https://docs.astral.sh/uv/)** (if running from source; for dependency management)
 
 ## Installation
 
