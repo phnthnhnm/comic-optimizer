@@ -11,7 +11,30 @@ class ComicOptimizerGUI:
         self.root.after(0, self.status.set, message)
 
     def show_info(self, message: str, title: str = "Done") -> None:
-        self.root.after(0, lambda: Messagebox.show_info(message, title=title))
+        import tkinter as tk
+
+        def show_custom_dialog():
+            dialog = tk.Toplevel(self.root)
+            dialog.title(title)
+            dialog.geometry("700x400")
+            dialog.resizable(True, True)
+            # Frame for padding
+            frame = tb.Frame(dialog, padding=15)
+            frame.pack(fill=tb.BOTH, expand=True)
+            # Text widget for report
+            text = tb.Text(frame, wrap="word", font=("Segoe UI", 10))
+            text.insert("1.0", message)
+            text.config(state="disabled")
+            text.pack(fill=tb.BOTH, expand=True)
+            # OK button
+            ok_btn = tb.Button(frame, text="OK", command=dialog.destroy, width=10)
+            ok_btn.pack(pady=10)
+            # Focus and modal
+            dialog.transient(self.root)
+            dialog.grab_set()
+            dialog.focus_set()
+
+        self.root.after(0, show_custom_dialog)
 
     def show_error(self, message: str, title: str = "Error") -> None:
         self.root.after(0, lambda: Messagebox.show_error(message, title=title))
