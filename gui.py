@@ -65,6 +65,7 @@ class GUI:
         settings_menu = ttk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Settings", menu=settings_menu)
         settings_menu.add_command(label="Preferences...", command=self.open_settings)
+        menubar.add_command(label="About", command=self.show_about)
 
         self.dir_path = ttk.StringVar()
         # Load available presets from presets.json
@@ -238,6 +239,12 @@ class GUI:
         except Exception as e:
             self.set_status(f"Error: {e}")
             self.show_error(str(e), title="Error")
+
+    def show_about(self):
+        from about import AboutDialog
+
+        dlg = AboutDialog(self.root)
+        dlg.show()
 
 
 def main() -> None:
