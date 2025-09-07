@@ -9,6 +9,7 @@ Comic Optimizer is a modern, user-friendly tool for optimizing comic book archiv
 - See the exact pingo command that will be run for each preset
 - Option to skip pingo optimization
 - Modern, easy-to-use GUI
+- User settings for theme, font, and more, saved per user in a cross-platform config directory
 
 ## Requirements
 
@@ -48,7 +49,7 @@ This will use `uv` and `pyinstaller` to create a standalone exe in the `dist` fo
 3. **Ensure pingo is installed and available in your PATH.**
 4. **Run the GUI:**
    ```sh
-   uv run main.py
+   uv run src/main.py
    ```
 
 ## How to Use
@@ -59,3 +60,30 @@ This will use `uv` and `pyinstaller` to create a standalone exe in the `dist` fo
    - The exact command for the selected preset is shown above the dropdown.
    - (Optional) Check "Skip pingo" to skip pingo optimization.
 4. Click "Start" to begin processing. A report will be shown when done.
+5. To change the theme, font, or other preferences, click the "Settings" menu in the menu bar.
+
+## User Settings Location
+
+User-specific settings (theme, font, etc.) are saved in a TOML file in a user-writable config directory:
+
+- **Windows:** `%APPDATA%/comic-optimizer/user_settings.toml`
+- **macOS:** `~/Library/Application Support/comic-optimizer/user_settings.toml`
+- **Linux:** `~/.config/comic-optimizer/user_settings.toml`
+
+This file is created automatically on first run. You can delete it to reset your preferences.
+
+## Troubleshooting
+
+- **Settings dialog does not open in the EXE:**
+    - Make sure you built the EXE using the provided `build.bat` script, which includes all required files.
+    - If you see an error about missing modules, ensure you are using the latest version and that your build includes
+      the `src/settings` directory.
+- **Settings are not saved or loaded:**
+    - Check that your user config directory is writable.
+    - Delete the `user_settings.toml` file to reset preferences if needed.
+- **General issues:**
+    - Run the EXE from a terminal (remove `--noconsole` from the build script) to see error messages.
+
+## License
+
+See [LICENSE](LICENSE) for details.
