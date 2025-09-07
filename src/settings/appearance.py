@@ -3,17 +3,19 @@ import tkinter.font as tkfont
 import ttkbootstrap as ttk
 
 from src import config
+from .settings_utils import load_user_settings, save_user_settings
 
 
 class AppearanceTab(ttk.Frame):
     def __init__(self, parent, root, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.root = root
+        self.user_settings = load_user_settings()
         # Theme selection
         theme_label = ttk.Label(self, text="Theme:", font=("Segoe UI", 10, "bold"))
         theme_label.pack(anchor="w", pady=(10, 2))
         theme_names = list(self.root.style.theme_names())
-        current_theme = self.root.style.theme_use()
+        current_theme = self.user_settings.get("theme") or self.root.style.theme_use()
         self.theme_var = ttk.StringVar(value=current_theme)
         theme_combo = ttk.Combobox(
             self,
@@ -27,6 +29,8 @@ class AppearanceTab(ttk.Frame):
         def apply_theme(event=None):
             new_theme = self.theme_var.get()
             self.root.style.theme_use(new_theme)
+            self.user_settings["theme"] = new_theme
+            save_user_settings(self.user_settings)
 
         theme_combo.bind("<<ComboboxSelected>>", apply_theme)
 
@@ -34,7 +38,8 @@ class AppearanceTab(ttk.Frame):
         font_label = ttk.Label(self, text="Font Family:", font=("Segoe UI", 10, "bold"))
         font_label.pack(anchor="w", pady=(10, 2))
         font_families = sorted(tkfont.families())
-        self.font_family_var = ttk.StringVar(value=config.DEFAULT_FONT_FAMILY)
+        font_family = self.user_settings.get("font_family") or config.DEFAULT_FONT_FAMILY
+        self.font_family_var = ttk.StringVar(value=font_family)
         font_family_combo = ttk.Combobox(
             self,
             textvariable=self.font_family_var,
@@ -47,7 +52,8 @@ class AppearanceTab(ttk.Frame):
         # Font size selection
         size_label = ttk.Label(self, text="Font Size:", font=("Segoe UI", 10, "bold"))
         size_label.pack(anchor="w", pady=(10, 2))
-        self.font_size_var = ttk.IntVar(value=config.DEFAULT_FONT_SIZE)
+        font_size = self.user_settings.get("font_size") or config.DEFAULT_FONT_SIZE
+        self.font_size_var = ttk.IntVar(value=font_size)
         size_spin = ttk.Spinbox(
             self,
             from_=8,
@@ -64,6 +70,9 @@ class AppearanceTab(ttk.Frame):
             size = self.font_size_var.get()
             new_font = (family, size)
             self._set_font_recursive(self.root, new_font)
+            self.user_settings["font_family"] = family
+            self.user_settings["font_size"] = size
+            save_user_settings(self.user_settings)
 
         font_family_combo.bind("<<ComboboxSelected>>", apply_font)
         self.font_size_var.trace_add("write", lambda *args: apply_font())

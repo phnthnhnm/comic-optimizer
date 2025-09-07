@@ -10,6 +10,7 @@ from ttkbootstrap.dialogs import Messagebox
 
 import config
 import core
+from settings.settings_utils import load_user_settings
 
 
 class GUI:
@@ -54,6 +55,12 @@ class GUI:
     """Modern Tkinter GUI for the Comic Optimizer using ttkbootstrap."""
 
     def __init__(self, root: ttk.Window):
+        user_settings = load_user_settings()
+        # Apply user font settings if available
+        font_family = user_settings.get("font_family", "Segoe UI")
+        font_size = user_settings.get("font_size", 10)
+        ttk.Style().configure(".", font=(font_family, font_size))
+
         self.preset_content = None
         self.root = root
         self.root.title("Comic Optimizer")
@@ -259,13 +266,12 @@ class GUI:
 
 
 def main() -> None:
-    """Entry point for the GUI application."""
-    # Detect system theme and set default theme accordingly
-    if darkdetect.isDark():
-        default_theme = "darkly"
-    else:
-        default_theme = "flatly"
-    root = ttk.Window(themename=default_theme)
+    from settings.settings_utils import load_user_settings
+    user_settings = load_user_settings()
+    theme = user_settings.get("theme")
+    if not theme:
+        theme = "darkly" if darkdetect.isDark() else "flatly"
+    root = ttk.Window(themename=theme)
     app = GUI(root)
     root.mainloop()
 
