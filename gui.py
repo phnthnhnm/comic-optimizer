@@ -8,6 +8,12 @@ import config
 
 
 class GUI:
+    def open_settings(self):
+        from settings.dialog import SettingsDialog
+
+        dlg = SettingsDialog(self.root)
+        dlg.show()
+
     def set_status(self, message: str) -> None:
         self.root.after(0, self.status.set, message)
 
@@ -50,6 +56,13 @@ class GUI:
         self.root.geometry("500x330")
         self.root.resizable(False, False)
 
+        # Settings menu
+        menubar = tb.Menu(self.root)
+        self.root.config(menu=menubar)
+        settings_menu = tb.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Settings", menu=settings_menu)
+        settings_menu.add_command(label="Preferences...", command=self.open_settings)
+
         self.dir_path = tb.StringVar()
         # Load available presets from presets.json
         import json
@@ -63,7 +76,6 @@ class GUI:
         )
         self.skip_pingo = tb.BooleanVar(value=False)
         self.status = tb.StringVar(value="Idle.")
-
         self.output_extension = tb.StringVar(value=".cbz")
         self.create_widgets()
 
