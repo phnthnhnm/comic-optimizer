@@ -4,11 +4,14 @@ import ttkbootstrap as ttk
 
 try:
     from version import __version__ as VERSION
+    from version import __version__ as VERSION
 except ImportError:
-    VERSION = "unknown"
-
-
-class AboutDialog:
+    try:
+        VERSION = subprocess.check_output([
+            'git', 'describe', '--tags', '--abbrev=0'
+        ], stderr=subprocess.STDOUT).decode().strip()
+    except Exception:
+        VERSION = "unknown"
     PROJECT_NAME = "Comic Optimizer"
     COPYRIGHT = "\u00A9 2025 phnthnhnm"
     SOURCE_URL = "https://github.com/phnthnhnm/comic-optimizer"
