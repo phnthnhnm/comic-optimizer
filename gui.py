@@ -3,10 +3,10 @@ import threading
 import ttkbootstrap as tb
 from ttkbootstrap.dialogs import Messagebox
 from tkinter import filedialog
-import optimizer_core
+import core
 
 
-class ComicOptimizerGUI:
+class GUI:
     def set_status(self, message: str) -> None:
         self.root.after(0, self.status.set, message)
 
@@ -127,7 +127,7 @@ class ComicOptimizerGUI:
                             self.set_status(
                                 f"Processing\n{os.path.basename(subfolder)}"
                             )
-                            pingo_output = optimizer_core.process_single_folder(
+                            pingo_output = core.process_single_folder(
                                 subfolder,
                                 zip_file_path,
                                 self.lossy.get(),
@@ -140,7 +140,7 @@ class ComicOptimizerGUI:
                     else:
                         zip_file_path = os.path.join(root_dir, f"{item}.cbz")
                         self.set_status(f"Processing\n{os.path.basename(item_path)}")
-                        pingo_output = optimizer_core.process_single_folder(
+                        pingo_output = core.process_single_folder(
                             item_path,
                             zip_file_path,
                             self.lossy.get(),
@@ -163,7 +163,7 @@ class ComicOptimizerGUI:
 def main() -> None:
     """Entry point for the GUI application."""
     root = tb.Window(themename="flatly")
-    app = ComicOptimizerGUI(root)
+    app = GUI(root)
     root.mainloop()
 
 

@@ -1,8 +1,8 @@
-import comic_optimizer_gui
+import gui
 
 
 def main():
-    comic_optimizer_gui.main()
+    gui.main()
 
 
 if __name__ == "__main__":
