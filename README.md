@@ -5,7 +5,7 @@ Comic Optimizer is a modern, user-friendly tool for optimizing comic book archiv
 ## Features
 
 - Batch optimize comic folders into CBZ/CBR/ZIP files
-- Select from multiple pingo presets (customizable in `preset.json`)
+- Select from multiple pingo presets (customizable in `presets.json`)
 - See the exact pingo command that will be run for each preset
 - Option to skip pingo optimization
 - Modern, easy-to-use GUI
@@ -55,7 +55,7 @@ This will use `uv` and `pyinstaller` to create a standalone exe in the `dist` fo
 
 1. Launch the application (either the EXE or from source).
 2. Click "Browse" to select the root directory containing your comic folders.
-3. Choose a pingo preset from the dropdown (presets are defined in `preset.json`).
+3. Choose a pingo preset from the dropdown (presets are defined in `presets.json`).
    - The exact command for the selected preset is shown above the dropdown.
    - (Optional) Check "Skip pingo" to skip pingo optimization.
 4. Click "Start" to begin processing. A report will be shown when done.

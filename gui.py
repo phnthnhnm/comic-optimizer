@@ -51,10 +51,10 @@ class GUI:
         self.root.resizable(False, False)
 
         self.dir_path = tb.StringVar()
-        # Load available presets from preset.json
+        # Load available presets from presets.json
         import json
 
-        preset_path = os.path.join(os.path.dirname(__file__), "preset.json")
+        preset_path = os.path.join(os.path.dirname(__file__), "presets.json")
         with open(preset_path, "r", encoding="utf-8") as f:
             self.preset_dict = json.load(f)
             self.presets = list(self.preset_dict.keys())

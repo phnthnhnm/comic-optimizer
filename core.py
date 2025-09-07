@@ -32,13 +32,13 @@ def rename_files_with_zero_padding(item_path: str) -> None:
 
 
 def run_pingo(item_path: str, preset_name: str) -> Optional[str]:
-    """Run pingo on the directory and return its output, using the selected preset from preset.json."""
-    preset_path = os.path.join(os.path.dirname(__file__), "preset.json")
+    """Run pingo on the directory and return its output, using the selected preset from presets.json."""
+    preset_path = os.path.join(os.path.dirname(__file__), "presets.json")
     with open(preset_path, "r", encoding="utf-8") as f:
         presets = json.load(f)
     cmd = presets.get(preset_name, [])
     if not cmd:
-        raise ValueError(f"Preset '{preset_name}' not found in preset.json")
+        raise ValueError(f"Preset '{preset_name}' not found in presets.json")
     cmd = cmd + [item_path]
     result = subprocess.run(cmd, capture_output=True, text=True)
     return result.stdout + ("\n" + result.stderr if result.stderr else "")
