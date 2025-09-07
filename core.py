@@ -3,16 +3,15 @@ import zipfile
 import subprocess
 from send2trash import send2trash
 from natsort import natsorted
-from typing import Optional, List
-
-IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".avif", ".gif"}
+from typing import Optional
+import config
 
 
 def delete_non_image_files(item_path: str) -> None:
     """Delete all non-image files in the given directory recursively."""
     for root, _, files in os.walk(item_path):
         for file in files:
-            if not any(file.endswith(ext) for ext in IMAGE_EXTENSIONS):
+            if not any(file.endswith(ext) for ext in config.IMAGE_EXTENSIONS):
                 os.remove(os.path.join(root, file))
 
 
@@ -21,7 +20,7 @@ def rename_files_with_zero_padding(item_path: str) -> None:
     image_files = [
         file
         for file in os.listdir(item_path)
-        if any(file.endswith(ext) for ext in IMAGE_EXTENSIONS)
+        if any(file.endswith(ext) for ext in config.IMAGE_EXTENSIONS)
     ]
     num_files = len(image_files)
     padding = len(str(num_files))
@@ -58,7 +57,7 @@ def remove_redundant_images(item_path: str) -> None:
         for file in files:
             name, ext = os.path.splitext(file)
             if (
-                ext.lower() in IMAGE_EXTENSIONS
+                ext.lower() in config.IMAGE_EXTENSIONS
                 and ext.lower() != ".webp"
                 and name in webp_files
             ):

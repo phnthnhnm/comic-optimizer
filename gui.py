@@ -42,15 +42,19 @@ class GUI:
     """Modern Tkinter GUI for the Comic Optimizer using ttkbootstrap."""
 
     def __init__(self, root: tb.Window):
+        import config
+
         self.root = root
         self.root.title("Comic Optimizer")
-        self.root.geometry("500x300")
+        self.root.geometry("500x330")
         self.root.resizable(False, False)
 
         self.dir_path = tb.StringVar()
         self.lossy = tb.BooleanVar(value=False)
         self.skip_pingo = tb.BooleanVar(value=False)
         self.status = tb.StringVar(value="Idle.")
+        self.output_extension = tb.StringVar(value=".cbz")
+        self.output_extensions = sorted(list(config.OUTPUT_EXTENSIONS))
 
         self.create_widgets()
 
@@ -71,9 +75,23 @@ class GUI:
         browse_btn = tb.Button(dir_frame, text="Browse", command=self.browse_dir)
         browse_btn.pack(side=tb.LEFT, padx=5)
 
+        # Output extension selection
+        ext_frame = tb.Frame(mainframe)
+        ext_frame.grid(row=2, column=0, sticky=tb.W, pady=(0, 10))
+        ext_label = tb.Label(ext_frame, text="Output Extension:", font=("Segoe UI", 10))
+        ext_label.pack(side=tb.LEFT)
+        ext_combo = tb.Combobox(
+            ext_frame,
+            textvariable=self.output_extension,
+            values=self.output_extensions,
+            width=8,
+            state="readonly",
+        )
+        ext_combo.pack(side=tb.LEFT, padx=(5, 0))
+
         # Options
         options_frame = tb.Frame(mainframe)
-        options_frame.grid(row=2, column=0, sticky=tb.W, pady=(0, 10))
+        options_frame.grid(row=3, column=0, sticky=tb.W, pady=(0, 10))
         lossy_chk = tb.Checkbutton(options_frame, text="Lossy", variable=self.lossy)
         lossy_chk.pack(side=tb.LEFT, padx=(0, 20))
         skip_chk = tb.Checkbutton(
@@ -85,13 +103,13 @@ class GUI:
         start_btn = tb.Button(
             mainframe, text="Start", command=self.start_processing, width=15
         )
-        start_btn.grid(row=3, column=0, pady=(0, 15))
+        start_btn.grid(row=4, column=0, pady=(0, 15))
 
         # Status label
         status_label = tb.Label(
             mainframe, textvariable=self.status, font=("Segoe UI", 10)
         )
-        status_label.grid(row=4, column=0, sticky=tb.W, pady=(10, 0))
+        status_label.grid(row=5, column=0, sticky=tb.W, pady=(10, 0))
 
     def browse_dir(self) -> None:
         path = filedialog.askdirectory()
@@ -109,6 +127,7 @@ class GUI:
     def process_folders(self) -> None:
         """Process all folders in the selected root directory."""
         root_dir = self.dir_path.get()
+        output_ext = self.output_extension.get()
         pingo_outputs = []
         try:
             for item in os.listdir(root_dir):
@@ -122,7 +141,7 @@ class GUI:
                     if subfolders:
                         for subfolder in subfolders:
                             zip_file_path = os.path.join(
-                                item_path, f"{os.path.basename(subfolder)}.cbz"
+                                item_path, f"{os.path.basename(subfolder)}{output_ext}"
                             )
                             self.set_status(
                                 f"Processing\n{os.path.basename(subfolder)}"
@@ -138,7 +157,7 @@ class GUI:
                                     f"{os.path.basename(subfolder)}:\n{pingo_output}"
                                 )
                     else:
-                        zip_file_path = os.path.join(root_dir, f"{item}.cbz")
+                        zip_file_path = os.path.join(root_dir, f"{item}{output_ext}")
                         self.set_status(f"Processing\n{os.path.basename(item_path)}")
                         pingo_output = core.process_single_folder(
                             item_path,
