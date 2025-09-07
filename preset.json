@@ -1,0 +1,4 @@
+{
+  "lossy": ["pingo", "-s4", "-webp", "-process=4"],
+  "lossless": ["pingo", "-s4", "-lossless", "-webp", "-process=4", "-no-jpeg"]
+}

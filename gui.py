@@ -4,6 +4,7 @@ import ttkbootstrap as tb
 from ttkbootstrap.dialogs import Messagebox
 from tkinter import filedialog
 import core
+import config
 
 
 class GUI:
@@ -50,12 +51,20 @@ class GUI:
         self.root.resizable(False, False)
 
         self.dir_path = tb.StringVar()
-        self.lossy = tb.BooleanVar(value=False)
+        # Load available presets from preset.json
+        import json
+
+        preset_path = os.path.join(os.path.dirname(__file__), "preset.json")
+        with open(preset_path, "r", encoding="utf-8") as f:
+            self.preset_dict = json.load(f)
+            self.presets = list(self.preset_dict.keys())
+        self.selected_preset = tb.StringVar(
+            value=self.presets[0] if self.presets else ""
+        )
         self.skip_pingo = tb.BooleanVar(value=False)
         self.status = tb.StringVar(value="Idle.")
-        self.output_extension = tb.StringVar(value=".cbz")
-        self.output_extensions = sorted(list(config.OUTPUT_EXTENSIONS))
 
+        self.output_extension = tb.StringVar(value=".cbz")
         self.create_widgets()
 
     def create_widgets(self) -> None:
@@ -83,17 +92,38 @@ class GUI:
         ext_combo = tb.Combobox(
             ext_frame,
             textvariable=self.output_extension,
-            values=self.output_extensions,
+            values=config.OUTPUT_EXTENSIONS,
             width=8,
             state="readonly",
         )
         ext_combo.pack(side=tb.LEFT, padx=(5, 0))
 
+        # Preset content display
+        self.preset_content = tb.StringVar()
+        self.preset_content.set(self._get_preset_content(self.selected_preset.get()))
+        preset_content_label = tb.Label(
+            mainframe,
+            textvariable=self.preset_content,
+            font=("Segoe UI", 9),
+            wraplength=450,
+            justify=tb.LEFT,
+            foreground="#555",
+        )
+        preset_content_label.grid(row=3, column=0, sticky=tb.W, pady=(0, 5))
+
         # Options
         options_frame = tb.Frame(mainframe)
-        options_frame.grid(row=3, column=0, sticky=tb.W, pady=(0, 10))
-        lossy_chk = tb.Checkbutton(options_frame, text="Lossy", variable=self.lossy)
-        lossy_chk.pack(side=tb.LEFT, padx=(0, 20))
+        options_frame.grid(row=4, column=0, sticky=tb.W, pady=(0, 10))
+        preset_label = tb.Label(options_frame, text="Pingo Preset:")
+        preset_label.pack(side=tb.LEFT)
+        preset_combo = tb.Combobox(
+            options_frame,
+            textvariable=self.selected_preset,
+            values=self.presets,
+            width=18,
+            state="readonly",
+        )
+        preset_combo.pack(side=tb.LEFT, padx=(0, 20))
         skip_chk = tb.Checkbutton(
             options_frame, text="Skip pingo", variable=self.skip_pingo
         )
@@ -103,13 +133,25 @@ class GUI:
         start_btn = tb.Button(
             mainframe, text="Start", command=self.start_processing, width=15
         )
-        start_btn.grid(row=4, column=0, pady=(0, 15))
+        start_btn.grid(row=5, column=0, pady=(0, 15))
 
         # Status label
         status_label = tb.Label(
             mainframe, textvariable=self.status, font=("Segoe UI", 10)
         )
-        status_label.grid(row=5, column=0, sticky=tb.W, pady=(10, 0))
+        status_label.grid(row=6, column=0, sticky=tb.W, pady=(10, 0))
+
+        # Update preset content when selection changes
+        preset_combo.bind("<<ComboboxSelected>>", self._on_preset_change)
+
+    def _get_preset_content(self, preset_name: str) -> str:
+        cmd = self.preset_dict.get(preset_name, [])
+        return (
+            "Command: " + " ".join(cmd) if cmd else "No command found for this preset."
+        )
+
+    def _on_preset_change(self, event=None):
+        self.preset_content.set(self._get_preset_content(self.selected_preset.get()))
 
     def browse_dir(self) -> None:
         path = filedialog.askdirectory()
@@ -149,7 +191,7 @@ class GUI:
                             pingo_output = core.process_single_folder(
                                 subfolder,
                                 zip_file_path,
-                                self.lossy.get(),
+                                self.selected_preset.get(),
                                 self.skip_pingo.get(),
                             )
                             if pingo_output:
@@ -162,7 +204,7 @@ class GUI:
                         pingo_output = core.process_single_folder(
                             item_path,
                             zip_file_path,
-                            self.lossy.get(),
+                            self.selected_preset.get(),
                             self.skip_pingo.get(),
                         )
                         if pingo_output:
