@@ -13,7 +13,8 @@ class AppearanceTab(ttk.Frame):
         theme_label = ttk.Label(self, text="Theme:", font=("Segoe UI", 10, "bold"))
         theme_label.pack(anchor="w", pady=(10, 2))
         theme_names = list(self.root.style.theme_names())
-        self.theme_var = ttk.StringVar(value=self.root.style.theme_use())
+        current_theme = self.root.style.theme_use()
+        self.theme_var = ttk.StringVar(value=current_theme)
         theme_combo = ttk.Combobox(
             self,
             textvariable=self.theme_var,

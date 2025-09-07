@@ -3,6 +3,7 @@ import os
 import threading
 from tkinter import filedialog
 
+import darkdetect
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import SUCCESS, DANGER
 from ttkbootstrap.dialogs import Messagebox
@@ -83,7 +84,7 @@ class GUI:
 
     def create_widgets(self) -> None:
         mainframe = ttk.Frame(self.root, padding=20)
-        mainframe.pack(fill=ttk.BOTH, expand=True)
+        mainframe.pack(fill="both", expand=True)
 
         # Warning label
         warning_label = ttk.Label(
@@ -93,28 +94,28 @@ class GUI:
             foreground="",
             style=DANGER
         )
-        warning_label.grid(row=0, column=0, sticky=ttk.W, pady=(0, 10))
+        warning_label.grid(row=0, column=0, sticky="w", pady=(0, 10))
 
         # Directory selection
         dir_label = ttk.Label(
             mainframe, text="Select Root Directory:", font=("Segoe UI", 10, "bold")
         )
-        dir_label.grid(row=1, column=0, sticky=ttk.W, pady=(0, 5))
+        dir_label.grid(row=1, column=0, sticky="w", pady=(0, 5))
 
         dir_frame = ttk.Frame(mainframe)
-        dir_frame.grid(row=2, column=0, sticky=ttk.W + ttk.E, pady=(0, 10))
+        dir_frame.grid(row=2, column=0, sticky="we", pady=(0, 10))
         dir_entry = ttk.Entry(dir_frame, textvariable=self.dir_path, width=40)
-        dir_entry.pack(side=ttk.LEFT, fill=ttk.X, expand=True)
+        dir_entry.pack(side="left", fill="x", expand=True)
         browse_btn = ttk.Button(dir_frame, text="Browse", command=self.browse_dir)
-        browse_btn.pack(side=ttk.LEFT, padx=5)
+        browse_btn.pack(side="left", padx=5)
 
         # Output extension selection
         ext_frame = ttk.Frame(mainframe)
-        ext_frame.grid(row=3, column=0, sticky=ttk.W, pady=(0, 10))
+        ext_frame.grid(row=3, column=0, sticky="w", pady=(0, 10))
         ext_label = ttk.Label(
             ext_frame, text="Output Extension:", font=("Segoe UI", 10)
         )
-        ext_label.pack(side=ttk.LEFT)
+        ext_label.pack(side="left")
         ext_combo = ttk.Combobox(
             ext_frame,
             textvariable=self.output_extension,
@@ -122,7 +123,7 @@ class GUI:
             width=8,
             state="readonly",
         )
-        ext_combo.pack(side=ttk.LEFT, padx=(5, 0))
+        ext_combo.pack(side="left", padx=(5, 0))
 
         # Preset content display
         self.preset_content = ttk.StringVar()
@@ -132,16 +133,16 @@ class GUI:
             textvariable=self.preset_content,
             font=("Segoe UI", 10),
             wraplength=450,
-            justify=ttk.LEFT,
+            justify="left",
             foreground="#555",
         )
-        preset_content_label.grid(row=4, column=0, sticky=ttk.W, pady=(0, 5))
+        preset_content_label.grid(row=4, column=0, sticky="w", pady=(0, 5))
 
         # Options
         options_frame = ttk.Frame(mainframe)
-        options_frame.grid(row=5, column=0, sticky=ttk.W, pady=(0, 10))
+        options_frame.grid(row=5, column=0, sticky="w", pady=(0, 10))
         preset_label = ttk.Label(options_frame, text="Pingo Preset:")
-        preset_label.pack(side=ttk.LEFT)
+        preset_label.pack(side="left")
         preset_combo = ttk.Combobox(
             options_frame,
             textvariable=self.selected_preset,
@@ -149,11 +150,11 @@ class GUI:
             width=18,
             state="readonly",
         )
-        preset_combo.pack(side=ttk.LEFT, padx=(0, 20))
+        preset_combo.pack(side="left", padx=(0, 20))
         skip_chk = ttk.Checkbutton(
             options_frame, text="Skip pingo", variable=self.skip_pingo
         )
-        skip_chk.pack(side=ttk.LEFT)
+        skip_chk.pack(side="left")
 
         # Start button
         start_btn = ttk.Button(
@@ -169,7 +170,7 @@ class GUI:
         status_label = ttk.Label(
             mainframe, textvariable=self.status, font=("Segoe UI", 10)
         )
-        status_label.grid(row=7, column=0, sticky=ttk.W, pady=(10, 0))
+        status_label.grid(row=7, column=0, sticky="w", pady=(10, 0))
 
         # Update preset content when selection changes
         preset_combo.bind("<<ComboboxSelected>>", self._on_preset_change)
@@ -259,7 +260,12 @@ class GUI:
 
 def main() -> None:
     """Entry point for the GUI application."""
-    root = ttk.Window(themename="flatly")
+    # Detect system theme and set default theme accordingly
+    if darkdetect.isDark():
+        default_theme = "darkly"
+    else:
+        default_theme = "flatly"
+    root = ttk.Window(themename=default_theme)
     app = GUI(root)
     root.mainloop()
 
