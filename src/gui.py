@@ -33,12 +33,12 @@ class GUI:
             dialog.resizable(True, True)
             # Frame for padding
             frame = ttk.Frame(dialog, padding=15)
-            frame.pack(fill=ttk.BOTH, expand=True)
+            frame.pack(fill="both", expand=True)
             # Text widget for report
             text = ttk.Text(frame, wrap="word", font=("Segoe UI", 10))
             text.insert("1.0", message)
             text.config(state="disabled")
-            text.pack(fill=ttk.BOTH, expand=True)
+            text.pack(fill="both", expand=True)
             # OK button
             ok_btn = ttk.Button(frame, text="OK", command=dialog.destroy, width=10)
             ok_btn.pack(pady=10)
@@ -47,10 +47,10 @@ class GUI:
             dialog.grab_set()
             dialog.focus_set()
 
-        self.root.after(0, show_custom_dialog)
+        self.root.after(0, lambda *args: show_custom_dialog())
 
     def show_error(self, message: str, title: str = "Error") -> None:
-        self.root.after(0, lambda: Messagebox.show_error(message, title=title))
+        self.root.after(0, lambda *args: Messagebox.show_error(message, title=title))
 
     """Modern Tkinter GUI for the Comic Optimizer using ttkbootstrap."""
 
@@ -70,9 +70,7 @@ class GUI:
         # Settings menu
         menubar = ttk.Menu(self.root)
         self.root.config(menu=menubar)
-        settings_menu = ttk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="Settings", menu=settings_menu)
-        settings_menu.add_command(label="Preferences...", command=self.open_settings)
+        menubar.add_command(label="Settings", command=self.open_settings)
         menubar.add_command(label="About", command=self.show_about)
 
         self.dir_path = ttk.StringVar()
