@@ -95,7 +95,7 @@ class GUI:
         warning_label = ttk.Label(
             mainframe,
             text="!! WARNING !! - DO BACKUP - USE ONLY ON TEST FILES",
-            font=("Segoe UI", 11, "bold"),
+            font=("Segoe UI", 10, "bold"),
             foreground="",
             style=DANGER
         )

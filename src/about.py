@@ -2,6 +2,7 @@ import subprocess
 import tkinter as tk
 
 import ttkbootstrap as ttk
+from ttkbootstrap.constants import PRIMARY
 
 try:
     from version import __version__ as VERSION
@@ -31,9 +32,9 @@ class AboutDialog:
         self.dialog.resizable(False, False)
         frame = ttk.Frame(self.dialog, padding=20)
         frame.pack(fill="both", expand=True)
-        label = ttk.Label(frame, text=about_text, font=("Segoe UI", 11), justify="left")
+        label = ttk.Label(frame, text=about_text, font=("Segoe UI", 10), justify="left")
         label.pack(anchor="w", pady=(0, 10))
-        link = ttk.Label(frame, text=self.SOURCE_URL, foreground="blue", cursor="hand2")
+        link = ttk.Label(frame, text=self.SOURCE_URL, style=PRIMARY, cursor="hand2")
         link.pack(anchor="w")
 
         def open_link(event):
