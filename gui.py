@@ -1,10 +1,14 @@
+import json
 import os
 import threading
-import ttkbootstrap as tb
-from ttkbootstrap.dialogs import Messagebox
 from tkinter import filedialog
-import core
+
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import SUCCESS
+from ttkbootstrap.dialogs import Messagebox
+
 import config
+import core
 
 
 class GUI:
@@ -26,15 +30,15 @@ class GUI:
             dialog.geometry("700x400")
             dialog.resizable(True, True)
             # Frame for padding
-            frame = tb.Frame(dialog, padding=15)
-            frame.pack(fill=tb.BOTH, expand=True)
+            frame = ttk.Frame(dialog, padding=15)
+            frame.pack(fill=ttk.BOTH, expand=True)
             # Text widget for report
-            text = tb.Text(frame, wrap="word", font=("Segoe UI", 10))
+            text = ttk.Text(frame, wrap="word", font=("Segoe UI", 10))
             text.insert("1.0", message)
             text.config(state="disabled")
-            text.pack(fill=tb.BOTH, expand=True)
+            text.pack(fill=ttk.BOTH, expand=True)
             # OK button
-            ok_btn = tb.Button(frame, text="OK", command=dialog.destroy, width=10)
+            ok_btn = ttk.Button(frame, text="OK", command=dialog.destroy, width=10)
             ok_btn.pack(pady=10)
             # Focus and modal
             dialog.transient(self.root)
@@ -48,110 +52,113 @@ class GUI:
 
     """Modern Tkinter GUI for the Comic Optimizer using ttkbootstrap."""
 
-    def __init__(self, root: tb.Window):
-        import config
-
+    def __init__(self, root: ttk.Window):
+        self.preset_content = None
         self.root = root
         self.root.title("Comic Optimizer")
         self.root.geometry("500x330")
-        self.root.resizable(False, False)
+        self.root.resizable(True, True)
 
         # Settings menu
-        menubar = tb.Menu(self.root)
+        menubar = ttk.Menu(self.root)
         self.root.config(menu=menubar)
-        settings_menu = tb.Menu(menubar, tearoff=0)
+        settings_menu = ttk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Settings", menu=settings_menu)
         settings_menu.add_command(label="Preferences...", command=self.open_settings)
 
-        self.dir_path = tb.StringVar()
+        self.dir_path = ttk.StringVar()
         # Load available presets from presets.json
-        import json
-
         preset_path = os.path.join(os.path.dirname(__file__), "presets.json")
         with open(preset_path, "r", encoding="utf-8") as f:
             self.preset_dict = json.load(f)
             self.presets = list(self.preset_dict.keys())
-        self.selected_preset = tb.StringVar(
+        self.selected_preset = ttk.StringVar(
             value=self.presets[0] if self.presets else ""
         )
-        self.skip_pingo = tb.BooleanVar(value=False)
-        self.status = tb.StringVar(value="Idle.")
-        self.output_extension = tb.StringVar(value=".cbz")
+        self.skip_pingo = ttk.BooleanVar(value=False)
+        self.status = ttk.StringVar(value="Idle.")
+        self.output_extension = ttk.StringVar(value=".cbz")
         self.create_widgets()
 
     def create_widgets(self) -> None:
-        mainframe = tb.Frame(self.root, padding=20)
-        mainframe.pack(fill=tb.BOTH, expand=True)
+        mainframe = ttk.Frame(self.root, padding=20)
+        mainframe.pack(fill=ttk.BOTH, expand=True)
 
         # Directory selection
-        dir_label = tb.Label(
-            mainframe, text="Select Root Directory:", font=("Segoe UI", 11, "bold")
+        dir_label = ttk.Label(
+            mainframe, text="Select Root Directory:", font=("Segoe UI", 10, "bold")
         )
-        dir_label.grid(row=0, column=0, sticky=tb.W, pady=(0, 5))
+        dir_label.grid(row=0, column=0, sticky=ttk.W, pady=(0, 5))
 
-        dir_frame = tb.Frame(mainframe)
-        dir_frame.grid(row=1, column=0, sticky=tb.W + tb.E, pady=(0, 10))
-        dir_entry = tb.Entry(dir_frame, textvariable=self.dir_path, width=40)
-        dir_entry.pack(side=tb.LEFT, fill=tb.X, expand=True)
-        browse_btn = tb.Button(dir_frame, text="Browse", command=self.browse_dir)
-        browse_btn.pack(side=tb.LEFT, padx=5)
+        dir_frame = ttk.Frame(mainframe)
+        dir_frame.grid(row=1, column=0, sticky=ttk.W + ttk.E, pady=(0, 10))
+        dir_entry = ttk.Entry(dir_frame, textvariable=self.dir_path, width=40)
+        dir_entry.pack(side=ttk.LEFT, fill=ttk.X, expand=True)
+        browse_btn = ttk.Button(dir_frame, text="Browse", command=self.browse_dir)
+        browse_btn.pack(side=ttk.LEFT, padx=5)
 
         # Output extension selection
-        ext_frame = tb.Frame(mainframe)
-        ext_frame.grid(row=2, column=0, sticky=tb.W, pady=(0, 10))
-        ext_label = tb.Label(ext_frame, text="Output Extension:", font=("Segoe UI", 10))
-        ext_label.pack(side=tb.LEFT)
-        ext_combo = tb.Combobox(
+        ext_frame = ttk.Frame(mainframe)
+        ext_frame.grid(row=2, column=0, sticky=ttk.W, pady=(0, 10))
+        ext_label = ttk.Label(
+            ext_frame, text="Output Extension:", font=("Segoe UI", 10)
+        )
+        ext_label.pack(side=ttk.LEFT)
+        ext_combo = ttk.Combobox(
             ext_frame,
             textvariable=self.output_extension,
             values=config.OUTPUT_EXTENSIONS,
             width=8,
             state="readonly",
         )
-        ext_combo.pack(side=tb.LEFT, padx=(5, 0))
+        ext_combo.pack(side=ttk.LEFT, padx=(5, 0))
 
         # Preset content display
-        self.preset_content = tb.StringVar()
+        self.preset_content = ttk.StringVar()
         self.preset_content.set(self._get_preset_content(self.selected_preset.get()))
-        preset_content_label = tb.Label(
+        preset_content_label = ttk.Label(
             mainframe,
             textvariable=self.preset_content,
-            font=("Segoe UI", 9),
+            font=("Segoe UI", 10),
             wraplength=450,
-            justify=tb.LEFT,
+            justify=ttk.LEFT,
             foreground="#555",
         )
-        preset_content_label.grid(row=3, column=0, sticky=tb.W, pady=(0, 5))
+        preset_content_label.grid(row=3, column=0, sticky=ttk.W, pady=(0, 5))
 
         # Options
-        options_frame = tb.Frame(mainframe)
-        options_frame.grid(row=4, column=0, sticky=tb.W, pady=(0, 10))
-        preset_label = tb.Label(options_frame, text="Pingo Preset:")
-        preset_label.pack(side=tb.LEFT)
-        preset_combo = tb.Combobox(
+        options_frame = ttk.Frame(mainframe)
+        options_frame.grid(row=4, column=0, sticky=ttk.W, pady=(0, 10))
+        preset_label = ttk.Label(options_frame, text="Pingo Preset:")
+        preset_label.pack(side=ttk.LEFT)
+        preset_combo = ttk.Combobox(
             options_frame,
             textvariable=self.selected_preset,
             values=self.presets,
             width=18,
             state="readonly",
         )
-        preset_combo.pack(side=tb.LEFT, padx=(0, 20))
-        skip_chk = tb.Checkbutton(
+        preset_combo.pack(side=ttk.LEFT, padx=(0, 20))
+        skip_chk = ttk.Checkbutton(
             options_frame, text="Skip pingo", variable=self.skip_pingo
         )
-        skip_chk.pack(side=tb.LEFT)
+        skip_chk.pack(side=ttk.LEFT)
 
         # Start button
-        start_btn = tb.Button(
-            mainframe, text="Start", command=self.start_processing, width=15
+        start_btn = ttk.Button(
+            mainframe,
+            text="Start",
+            command=self.start_processing,
+            width=15,
+            style=SUCCESS,
         )
         start_btn.grid(row=5, column=0, pady=(0, 15))
 
         # Status label
-        status_label = tb.Label(
+        status_label = ttk.Label(
             mainframe, textvariable=self.status, font=("Segoe UI", 10)
         )
-        status_label.grid(row=6, column=0, sticky=tb.W, pady=(10, 0))
+        status_label.grid(row=6, column=0, sticky=ttk.W, pady=(10, 0))
 
         # Update preset content when selection changes
         preset_combo.bind("<<ComboboxSelected>>", self._on_preset_change)
@@ -235,7 +242,7 @@ class GUI:
 
 def main() -> None:
     """Entry point for the GUI application."""
-    root = tb.Window(themename="flatly")
+    root = ttk.Window(themename="flatly")
     app = GUI(root)
     root.mainloop()
 

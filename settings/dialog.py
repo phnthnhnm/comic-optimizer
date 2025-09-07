@@ -1,6 +1,8 @@
-import ttkbootstrap as tb
-from .appearance import AppearanceTab
 import tkinter as tk
+
+import ttkbootstrap as ttk
+
+from .appearance import AppearanceTab
 
 
 class SettingsDialog:
@@ -11,8 +13,8 @@ class SettingsDialog:
         self.win.geometry("500x500")
         self.win.resizable(False, False)
 
-        nb = tb.Notebook(self.win)
-        nb.pack(fill=tb.BOTH, expand=True, padx=10, pady=10)
+        nb = ttk.Notebook(self.win)
+        nb.pack(fill=ttk.BOTH, expand=True, padx=10, pady=10)
 
         # Add Appearance tab
         appearance_tab = AppearanceTab(nb, root)
