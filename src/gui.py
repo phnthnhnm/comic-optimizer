@@ -4,7 +4,7 @@ import threading
 from tkinter import filedialog
 
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import SUCCESS
+from ttkbootstrap.constants import SUCCESS, DANGER
 from ttkbootstrap.dialogs import Messagebox
 
 import config
@@ -85,14 +85,24 @@ class GUI:
         mainframe = ttk.Frame(self.root, padding=20)
         mainframe.pack(fill=ttk.BOTH, expand=True)
 
+        # Warning label
+        warning_label = ttk.Label(
+            mainframe,
+            text="!! WARNING !! - DO BACKUP - USE ONLY ON TEST FILES",
+            font=("Segoe UI", 11, "bold"),
+            foreground="",
+            style=DANGER
+        )
+        warning_label.grid(row=0, column=0, sticky=ttk.W, pady=(0, 10))
+
         # Directory selection
         dir_label = ttk.Label(
             mainframe, text="Select Root Directory:", font=("Segoe UI", 10, "bold")
         )
-        dir_label.grid(row=0, column=0, sticky=ttk.W, pady=(0, 5))
+        dir_label.grid(row=1, column=0, sticky=ttk.W, pady=(0, 5))
 
         dir_frame = ttk.Frame(mainframe)
-        dir_frame.grid(row=1, column=0, sticky=ttk.W + ttk.E, pady=(0, 10))
+        dir_frame.grid(row=2, column=0, sticky=ttk.W + ttk.E, pady=(0, 10))
         dir_entry = ttk.Entry(dir_frame, textvariable=self.dir_path, width=40)
         dir_entry.pack(side=ttk.LEFT, fill=ttk.X, expand=True)
         browse_btn = ttk.Button(dir_frame, text="Browse", command=self.browse_dir)
@@ -100,7 +110,7 @@ class GUI:
 
         # Output extension selection
         ext_frame = ttk.Frame(mainframe)
-        ext_frame.grid(row=2, column=0, sticky=ttk.W, pady=(0, 10))
+        ext_frame.grid(row=3, column=0, sticky=ttk.W, pady=(0, 10))
         ext_label = ttk.Label(
             ext_frame, text="Output Extension:", font=("Segoe UI", 10)
         )
@@ -125,11 +135,11 @@ class GUI:
             justify=ttk.LEFT,
             foreground="#555",
         )
-        preset_content_label.grid(row=3, column=0, sticky=ttk.W, pady=(0, 5))
+        preset_content_label.grid(row=4, column=0, sticky=ttk.W, pady=(0, 5))
 
         # Options
         options_frame = ttk.Frame(mainframe)
-        options_frame.grid(row=4, column=0, sticky=ttk.W, pady=(0, 10))
+        options_frame.grid(row=5, column=0, sticky=ttk.W, pady=(0, 10))
         preset_label = ttk.Label(options_frame, text="Pingo Preset:")
         preset_label.pack(side=ttk.LEFT)
         preset_combo = ttk.Combobox(
@@ -153,13 +163,13 @@ class GUI:
             width=15,
             style=SUCCESS,
         )
-        start_btn.grid(row=5, column=0, pady=(0, 15))
+        start_btn.grid(row=6, column=0, pady=(0, 15))
 
         # Status label
         status_label = ttk.Label(
             mainframe, textvariable=self.status, font=("Segoe UI", 10)
         )
-        status_label.grid(row=6, column=0, sticky=ttk.W, pady=(10, 0))
+        status_label.grid(row=7, column=0, sticky=ttk.W, pady=(10, 0))
 
         # Update preset content when selection changes
         preset_combo.bind("<<ComboboxSelected>>", self._on_preset_change)
