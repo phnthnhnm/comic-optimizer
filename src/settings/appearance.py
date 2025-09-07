@@ -1,8 +1,8 @@
 import tkinter.font as tkfont
 
+import config
 import ttkbootstrap as ttk
 
-from src import config
 from .settings_utils import load_user_settings, save_user_settings
 
 
