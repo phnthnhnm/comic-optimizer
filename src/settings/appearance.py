@@ -2,7 +2,7 @@ import tkinter.font as tkfont
 
 import ttkbootstrap as ttk
 
-import config
+from src import config
 
 
 class AppearanceTab(ttk.Frame):

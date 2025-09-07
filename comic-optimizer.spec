@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['main.py'],
+    ['src\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[('presets.json', '.')],
+    datas=[('src/presets.json', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

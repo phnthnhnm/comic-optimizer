@@ -1,10 +1,12 @@
-import os
-import zipfile
-import subprocess
 import json
-from send2trash import send2trash
-from natsort import natsorted
+import os
+import subprocess
+import zipfile
 from typing import Optional
+
+from natsort import natsorted
+from send2trash import send2trash
+
 import config
 
 
