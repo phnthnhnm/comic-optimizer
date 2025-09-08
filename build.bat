@@ -9,11 +9,9 @@ for /f "delims=v" %%i in ('git tag --sort=-version:refname 2^>nul') do set "GIT_
 
 if "%GIT_TAG%"=="" (
     echo No Git tag found. Using default version.
-    set "FINAL_NAME=comic-optimizer-dev"
     set "VERSION_STRING=dev"
 ) else (
     echo Found Git tag: v%GIT_TAG%
-    set "FINAL_NAME=comic-optimizer-%GIT_TAG%"
     set "VERSION_STRING=%GIT_TAG%"
 )
 
@@ -23,22 +21,15 @@ REM --------------------------------------------------------------------------
 (echo __version__ = "%VERSION_STRING%") > src/version.py
 
 REM --------------------------------------------------------------------------
-REM Delete the existing spec file to force a new one to be generated.
+REM Run Nuitka
 REM --------------------------------------------------------------------------
-if exist comic-optimizer.spec (
-    echo Deleting old comic-optimizer.spec...
-    del /q /f comic-optimizer.spec
-)
+uv run nuitka --standalone --msvc=latest --product-name=comic-optimizer --product-version=%VERSION_STRING% --copyright="© 2025 Nam Phan" --enable-plugin=tk-inter --enable-plugin=upx --windows-console-mode=disable --windows-icon-from-ico=python.ico --output-dir=dist --remove-output --output-filename=comic-optimizer.exe src/main.py --include-data-file=src/presets.json=presets.json
 
-REM --------------------------------------------------------------------------
-REM Run PyInstaller, setting a static name to keep the .spec file name consistent.
-REM --------------------------------------------------------------------------
-uv run pyinstaller --onefile --noconsole --name comic-optimizer src/main.py --add-data "src/presets.json;."
+REM Rename main.dist to comic-optimizer
+ren dist\main.dist comic-optimizer
 
-REM --------------------------------------------------------------------------
-REM Rename the output executable to include the version tag.
-REM --------------------------------------------------------------------------
-echo Renaming executable...
-rename "dist\comic-optimizer.exe" "%FINAL_NAME%.exe"
-
+REM Zip the folder
+pushd dist
+7z a comic-optimizer-%VERSION_STRING%.zip comic-optimizer
+popd
 PAUSE

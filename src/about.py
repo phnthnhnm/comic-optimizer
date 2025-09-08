@@ -17,7 +17,7 @@ except ImportError:
 
 class AboutDialog:
     PROJECT_NAME = "Comic Optimizer"
-    COPYRIGHT = "\u00A9 2025 phnthnhnm"
+    COPYRIGHT = "\u00A9 2025 Nam Phan"
     SOURCE_URL = "https://github.com/phnthnhnm/comic-optimizer"
 
     def __init__(self, parent):
