@@ -19,21 +19,24 @@ Comic Optimizer is a modern, user-friendly tool for optimizing comic book archiv
 
 ## Installation
 
-### Download the Standalone Executable
+### Download the Standalone Release (Recommended)
 
 - Go to the [GitHub Releases](https://github.com/phnthnhnm/comic-optimizer/releases) page.
-- Download the latest `comic-optimizer.exe` file for Windows.
-- Double-click the executable to launch the GUI.
+- Download the latest `comic-optimizer-<version>.zip` file for Windows.
+- Extract the zip file. Inside, you will find a `comic-optimizer` folder.
+- Open the `comic-optimizer` folder and double-click `comic-optimizer.exe` to launch the GUI.
 
-### Build the Standalone Executable Yourself
+### Build the Standalone Release Yourself
 
-If you want to build the Windows executable yourself, simply run:
+If you want to build the Windows release yourself, simply run:
 
 ```bat
 build.bat
 ```
 
-This will use `uv` and `pyinstaller` to create a standalone exe in the `dist` folder. Make sure you have all dependencies installed (see Requirements above).
+This will use `uv` and [Nuitka](https://nuitka.net/) to create a standalone folder in the `dist` directory. The output
+will be a `comic-optimizer` folder containing `comic-optimizer.exe` and all required files. The build script will also
+zip this folder for distribution.
 
 ### Run from Source
 
@@ -54,7 +57,7 @@ This will use `uv` and `pyinstaller` to create a standalone exe in the `dist` fo
 
 ## How to Use
 
-1. Launch the application (either the EXE or from source).
+1. Launch the application (either from the extracted release folder or from source).
 2. Click "Browse" to select the root directory containing your comic folders.
 3. Choose a pingo preset from the dropdown (presets are defined in `presets.json`).
    - The exact command for the selected preset is shown above the dropdown.
@@ -74,15 +77,15 @@ This file is created automatically on first run. You can delete it to reset your
 
 ## Troubleshooting
 
-- **Settings dialog does not open in the EXE:**
-    - Make sure you built the EXE using the provided `build.bat` script, which includes all required files.
-    - If you see an error about missing modules, ensure you are using the latest version and that your build includes
-      the `src/settings` directory.
+- **Settings dialog does not open in the release:**
+    - Make sure you are using the latest release zip and have extracted all files before running the exe.
+    - If you see an error about missing modules, ensure you are running `comic-optimizer.exe` from inside the extracted
+      `comic-optimizer` folder.
 - **Settings are not saved or loaded:**
     - Check that your user config directory is writable.
     - Delete the `user_settings.toml` file to reset preferences if needed.
 - **General issues:**
-    - Run the EXE from a terminal (remove `--noconsole` from the build script) to see error messages.
+    - Run the exe from a terminal (e.g., `cmd.exe`) to see error messages.
 
 ## License
 
