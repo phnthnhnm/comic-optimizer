@@ -26,6 +26,9 @@ DEFAULT_SETTINGS = {
     'font_family': 'Segoe UI',
     'font_size': 10,
     'last_root_dir': '',
+    'last_preset': '',
+    'skip_pingo': False,
+    'last_output_ext': '.cbz',
     'presets': {
         'lossy': ["pingo", "-s4", "-webp", "-process=4"],
         'lossless': ["pingo", "-s4", "-lossless", "-webp", "-process=4", "-no-jpeg"]

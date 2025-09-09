@@ -49,15 +49,25 @@ class GUI:
         # Set dir_path to last_root_dir if available
         last_dir = self.user_settings.get("last_root_dir", "")
         self.dir_path = ttk.StringVar(value=last_dir)
+
         # Load available presets from user_settings
         self.preset_dict = self.user_settings.get("presets", {})
         self.presets = list(self.preset_dict.keys())
-        self.selected_preset = ttk.StringVar(
-            value=self.presets[0] if self.presets else ""
-        )
-        self.skip_pingo = ttk.BooleanVar(value=False)
+
+        # Set selected_preset from last_preset if available and valid
+        last_preset = self.user_settings.get("last_preset", "")
+        initial_preset = last_preset if last_preset in self.presets else (self.presets[0] if self.presets else "")
+        self.selected_preset = ttk.StringVar(value=initial_preset)
+
+        # Set skip_pingo from user_settings
+        self.skip_pingo = ttk.BooleanVar(value=self.user_settings.get("skip_pingo", False))
         self.status = ttk.StringVar(value="Idle.")
-        self.output_extension = ttk.StringVar(value=".cbz")
+
+        # Set output_extension from last_output_ext if available and valid
+        last_output_ext = self.user_settings.get("last_output_ext", ".cbz")
+        initial_output_ext = last_output_ext if last_output_ext in config.OUTPUT_EXTENSIONS else \
+        config.OUTPUT_EXTENSIONS[0]
+        self.output_extension = ttk.StringVar(value=initial_output_ext)
         self.report_text = None  # Initialize here to avoid warning
         self.create_widgets()
 
@@ -111,6 +121,7 @@ class GUI:
             state="readonly",
         )
         ext_combo.pack(side="left", padx=(5, 0))
+        ext_combo.bind("<<ComboboxSelected>>", self._on_output_ext_change)
 
         # Preset content display
         self.preset_content = ttk.StringVar()
@@ -139,7 +150,8 @@ class GUI:
         )
         preset_combo.pack(side="left", padx=(0, 20))
         skip_chk = ttk.Checkbutton(
-            options_frame, text="Skip pingo", variable=self.skip_pingo
+            options_frame, text="Skip pingo", variable=self.skip_pingo,
+            command=self._on_skip_pingo_change
         )
         skip_chk.pack(side="left")
 
@@ -182,7 +194,20 @@ class GUI:
         )
 
     def _on_preset_change(self, event=None):
+        """Save last chosen preset."""
         self.preset_content.set(self._get_preset_content(self.selected_preset.get()))
+        self.user_settings["last_preset"] = self.selected_preset.get()
+        save_user_settings(self.user_settings)
+
+    def _on_skip_pingo_change(self):
+        """Save skip_pingo state."""
+        self.user_settings["skip_pingo"] = self.skip_pingo.get()
+        save_user_settings(self.user_settings)
+
+    def _on_output_ext_change(self, event=None):
+        """Save last selected output extension."""
+        self.user_settings["last_output_ext"] = self.output_extension.get()
+        save_user_settings(self.user_settings)
 
     def browse_dir(self) -> None:
         path = filedialog.askdirectory()
