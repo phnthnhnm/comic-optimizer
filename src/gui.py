@@ -1,4 +1,3 @@
-import json
 import os
 import threading
 from tkinter import filedialog
@@ -76,11 +75,9 @@ class GUI:
         # Set dir_path to last_root_dir if available
         last_dir = self.user_settings.get("last_root_dir", "")
         self.dir_path = ttk.StringVar(value=last_dir)
-        # Load available presets from presets.json
-        preset_path = os.path.join(os.path.dirname(__file__), "presets.json")
-        with open(preset_path, "r", encoding="utf-8") as f:
-            self.preset_dict = json.load(f)
-            self.presets = list(self.preset_dict.keys())
+        # Load available presets from user_settings
+        self.preset_dict = self.user_settings.get("presets", {})
+        self.presets = list(self.preset_dict.keys())
         self.selected_preset = ttk.StringVar(
             value=self.presets[0] if self.presets else ""
         )
@@ -234,6 +231,7 @@ class GUI:
                                 zip_file_path,
                                 self.selected_preset.get(),
                                 self.skip_pingo.get(),
+                                self.preset_dict
                             )
                             if pingo_output:
                                 pingo_outputs.append(
@@ -247,6 +245,7 @@ class GUI:
                             zip_file_path,
                             self.selected_preset.get(),
                             self.skip_pingo.get(),
+                            self.preset_dict
                         )
                         if pingo_output:
                             pingo_outputs.append(

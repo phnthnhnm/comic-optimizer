@@ -1,4 +1,3 @@
-import json
 import os
 import subprocess
 import zipfile
@@ -33,14 +32,11 @@ def rename_files_with_zero_padding(item_path: str) -> None:
         os.rename(os.path.join(item_path, file), os.path.join(item_path, new_name))
 
 
-def run_pingo(item_path: str, preset_name: str) -> Optional[str]:
-    """Run pingo on the directory and return its output, using the selected preset from presets.json."""
-    preset_path = os.path.join(os.path.dirname(__file__), "presets.json")
-    with open(preset_path, "r", encoding="utf-8") as f:
-        presets = json.load(f)
+def run_pingo(item_path: str, preset_name: str, presets: dict) -> Optional[str]:
+    """Run pingo on the directory and return its output, using the selected preset from the given presets dict."""
     cmd = presets.get(preset_name, [])
     if not cmd:
-        raise ValueError(f"Preset '{preset_name}' not found in presets.json")
+        raise ValueError(f"Preset '{preset_name}' not found in user settings")
     cmd = cmd + [item_path]
     result = subprocess.run(cmd, capture_output=True, text=True)
     return result.stdout + ("\n" + result.stderr if result.stderr else "")
@@ -86,14 +82,14 @@ def safe_remove_folder(item_path: str) -> None:
 
 
 def process_single_folder(
-    item_path: str, zip_file_path: str, preset_name: str, skip_pingo: bool
+        item_path: str, zip_file_path: str, preset_name: str, skip_pingo: bool, presets: dict
 ) -> Optional[str]:
     """Process a single folder and return pingo output if run."""
     delete_non_image_files(item_path)
     rename_files_with_zero_padding(item_path)
     pingo_output = None
     if not skip_pingo:
-        pingo_output = run_pingo(item_path, preset_name)
+        pingo_output = run_pingo(item_path, preset_name, presets)
     remove_redundant_images(item_path)
     compress_to_cbz(item_path, zip_file_path)
     safe_remove_folder(item_path)

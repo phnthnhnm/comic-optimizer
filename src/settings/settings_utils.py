@@ -22,7 +22,11 @@ DEFAULT_SETTINGS = {
     'theme': None,  # None means auto-detect
     'font_family': 'Segoe UI',
     'font_size': 10,
-    'last_root_dir': ''
+    'last_root_dir': '',
+    'presets': {
+        'lossy': ["pingo", "-s4", "-webp", "-process=4"],
+        'lossless': ["pingo", "-s4", "-lossless", "-webp", "-process=4", "-no-jpeg"]
+    }
 }
 
 
@@ -33,7 +37,12 @@ def load_user_settings():
     try:
         data = toml.load(SETTINGS_FILE)
         settings = DEFAULT_SETTINGS.copy()
-        settings.update({k: data.get(k, v) for k, v in DEFAULT_SETTINGS.items()})
+        # Merge presets dict if present, else use default
+        settings['presets'] = data.get('presets', DEFAULT_SETTINGS['presets'])
+        # Merge other settings
+        for k, v in DEFAULT_SETTINGS.items():
+            if k != 'presets':
+                settings[k] = data.get(k, v)
         return settings
     except Exception:
         save_user_settings(DEFAULT_SETTINGS)

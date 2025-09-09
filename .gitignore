@@ -15,5 +15,4 @@ wheels/
 
 # Ignore generated files
 src/version.py
-src/settings/user_settings.toml
 *.spec
