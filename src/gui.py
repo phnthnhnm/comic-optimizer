@@ -10,7 +10,7 @@ from ttkbootstrap.dialogs import Messagebox
 
 import config
 import core
-from settings.settings_utils import load_user_settings
+from settings.settings_utils import load_user_settings, save_user_settings
 
 
 class GUI:
@@ -55,10 +55,10 @@ class GUI:
     """Modern Tkinter GUI for the Comic Optimizer using ttkbootstrap."""
 
     def __init__(self, root: ttk.Window):
-        user_settings = load_user_settings()
+        self.user_settings = load_user_settings()
         # Apply user font settings if available
-        font_family = user_settings.get("font_family", "Segoe UI")
-        font_size = user_settings.get("font_size", 10)
+        font_family = self.user_settings.get("font_family", "Segoe UI")
+        font_size = self.user_settings.get("font_size", 10)
         ttk.Style().configure(".", font=(font_family, font_size))
 
         self.preset_content = None
@@ -73,7 +73,9 @@ class GUI:
         menubar.add_command(label="Settings", command=self.open_settings)
         menubar.add_command(label="About", command=self.show_about)
 
-        self.dir_path = ttk.StringVar()
+        # Set dir_path to last_root_dir if available
+        last_dir = self.user_settings.get("last_root_dir", "")
+        self.dir_path = ttk.StringVar(value=last_dir)
         # Load available presets from presets.json
         preset_path = os.path.join(os.path.dirname(__file__), "presets.json")
         with open(preset_path, "r", encoding="utf-8") as f:
@@ -193,6 +195,9 @@ class GUI:
         path = filedialog.askdirectory()
         if path:
             self.dir_path.set(path)
+            # Save last selected root directory
+            self.user_settings["last_root_dir"] = path
+            save_user_settings(self.user_settings)
 
     def start_processing(self) -> None:
         """Start the processing in a background thread."""

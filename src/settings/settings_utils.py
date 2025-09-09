@@ -4,8 +4,6 @@ import sys
 import toml
 
 
-# Determine user config directory cross-platform
-
 def get_user_config_dir():
     if sys.platform == "win32":
         base = os.environ.get("APPDATA", os.path.expanduser("~"))
@@ -23,7 +21,8 @@ SETTINGS_FILE = os.path.join(USER_CONFIG_DIR, 'user_settings.toml')
 DEFAULT_SETTINGS = {
     'theme': None,  # None means auto-detect
     'font_family': 'Segoe UI',
-    'font_size': 10
+    'font_size': 10,
+    'last_root_dir': ''
 }
 
 
