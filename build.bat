@@ -23,7 +23,7 @@ REM --------------------------------------------------------------------------
 REM --------------------------------------------------------------------------
 REM Run Nuitka
 REM --------------------------------------------------------------------------
-uv run nuitka --standalone --msvc=latest --product-name=comic-optimizer --product-version=%VERSION_STRING% --copyright="© 2025 Nam Phan" --enable-plugin=tk-inter --enable-plugin=upx --windows-console-mode=disable --windows-icon-from-ico=python.ico --output-dir=dist --remove-output --output-filename=comic-optimizer.exe src/main.py --include-data-file=src/presets.json=presets.json
+uv run nuitka --standalone --msvc=latest --product-name=comic-optimizer --product-version=%VERSION_STRING% --copyright="© 2025 Nam Phan" --enable-plugin=tk-inter --enable-plugin=upx --windows-console-mode=disable --windows-icon-from-ico=python.ico --output-dir=dist --remove-output --output-filename=comic-optimizer.exe src/main.py
 
 REM Rename main.dist to comic-optimizer
 ren dist\main.dist comic-optimizer

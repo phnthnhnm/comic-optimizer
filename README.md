@@ -26,6 +26,23 @@ Comic Optimizer is a modern, user-friendly tool for optimizing comic book archiv
 - Extract the zip file. Inside, you will find a `comic-optimizer` folder.
 - Open the `comic-optimizer` folder and double-click `comic-optimizer.exe` to launch the GUI.
 
+### Install with Scoop (Alternative)
+
+If you use [Scoop](https://scoop.sh/) on Windows, you can install Comic Optimizer easily:
+
+1. Add the bucket containing Comic Optimizer (replace `mybucket` with your preferred local bucket name):
+   ```sh
+   scoop bucket add mybucket https://github.com/phnthnhnm/Scoop.git
+   ```
+2. Install Comic Optimizer:
+   ```sh
+   scoop install comic-optimizer
+   ```
+3. After installation, you can launch Comic Optimizer from the Start Menu or by running:
+   ```sh
+   comic-optimizer
+   ```
+
 ### Build the Standalone Release Yourself
 
 If you want to build the Windows release yourself, simply run:
