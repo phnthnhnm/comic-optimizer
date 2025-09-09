@@ -1,4 +1,3 @@
-import os
 import threading
 from tkinter import filedialog
 
@@ -201,56 +200,21 @@ class GUI:
         if not self.dir_path.get():
             Messagebox.show_error("Please select a directory.", title="Error")
             return
-        self.status.set("Processing...")
-        threading.Thread(target=self.process_folders, daemon=True).start()
+        threading.Thread(target=self.run_processing_thread, daemon=True).start()
 
-    def process_folders(self) -> None:
-        """Process all folders in the selected root directory."""
+    def run_processing_thread(self) -> None:
+        """Thread target: call core.process_root_directory and update GUI."""
         root_dir = self.dir_path.get()
         output_ext = self.output_extension.get()
-        pingo_outputs = []
         try:
-            for item in os.listdir(root_dir):
-                item_path = os.path.join(root_dir, item)
-                if os.path.isdir(item_path):
-                    subfolders = [
-                        os.path.join(item_path, subfolder)
-                        for subfolder in os.listdir(item_path)
-                        if os.path.isdir(os.path.join(item_path, subfolder))
-                    ]
-                    if subfolders:
-                        for subfolder in subfolders:
-                            zip_file_path = os.path.join(
-                                item_path, f"{os.path.basename(subfolder)}{output_ext}"
-                            )
-                            self.set_status(
-                                f"Processing\n{os.path.basename(subfolder)}"
-                            )
-                            pingo_output = core.process_single_folder(
-                                subfolder,
-                                zip_file_path,
-                                self.selected_preset.get(),
-                                self.skip_pingo.get(),
-                                self.preset_dict
-                            )
-                            if pingo_output:
-                                pingo_outputs.append(
-                                    f"{os.path.basename(subfolder)}:\n{pingo_output}"
-                                )
-                    else:
-                        zip_file_path = os.path.join(root_dir, f"{item}{output_ext}")
-                        self.set_status(f"Processing\n{os.path.basename(item_path)}")
-                        pingo_output = core.process_single_folder(
-                            item_path,
-                            zip_file_path,
-                            self.selected_preset.get(),
-                            self.skip_pingo.get(),
-                            self.preset_dict
-                        )
-                        if pingo_output:
-                            pingo_outputs.append(
-                                f"{os.path.basename(item_path)}:\n{pingo_output}"
-                            )
+            pingo_outputs = core.process_root_directory(
+                root_dir,
+                output_ext,
+                self.selected_preset.get(),
+                self.skip_pingo.get(),
+                self.preset_dict,
+                status_callback=self.set_status
+            )
             self.set_status("Done!")
             output_message = (
                 "\n\n".join(pingo_outputs) if pingo_outputs else "Processing complete!"

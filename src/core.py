@@ -94,3 +94,61 @@ def process_single_folder(
     compress_to_cbz(item_path, zip_file_path)
     safe_remove_folder(item_path)
     return pingo_output
+
+
+def process_root_directory(
+        root_dir: str,
+        output_ext: str,
+        selected_preset: str,
+        skip_pingo: bool,
+        preset_dict: dict,
+        status_callback=None
+) -> list:
+    """
+    Process all folders in the selected root directory.
+    Returns a list of output messages for each processed folder.
+    status_callback: optional function to update status (e.g., for GUI)
+    """
+    pingo_outputs = []
+    for item in os.listdir(root_dir):
+        item_path = os.path.join(root_dir, item)
+        if os.path.isdir(item_path):
+            subfolders = [
+                os.path.join(item_path, subfolder)
+                for subfolder in os.listdir(item_path)
+                if os.path.isdir(os.path.join(item_path, subfolder))
+            ]
+            if subfolders:
+                for subfolder in subfolders:
+                    zip_file_path = os.path.join(
+                        item_path, f"{os.path.basename(subfolder)}{output_ext}"
+                    )
+                    if status_callback:
+                        status_callback(f"Processing\n{os.path.basename(subfolder)}")
+                    pingo_output = process_single_folder(
+                        subfolder,
+                        zip_file_path,
+                        selected_preset,
+                        skip_pingo,
+                        preset_dict
+                    )
+                    if pingo_output:
+                        pingo_outputs.append(
+                            f"{os.path.basename(subfolder)}:\n{pingo_output}"
+                        )
+            else:
+                zip_file_path = os.path.join(root_dir, f"{item}{output_ext}")
+                if status_callback:
+                    status_callback(f"Processing\n{os.path.basename(item_path)}")
+                pingo_output = process_single_folder(
+                    item_path,
+                    zip_file_path,
+                    selected_preset,
+                    skip_pingo,
+                    preset_dict
+                )
+                if pingo_output:
+                    pingo_outputs.append(
+                        f"{os.path.basename(item_path)}:\n{pingo_output}"
+                    )
+    return pingo_outputs
