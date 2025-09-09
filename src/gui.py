@@ -4,7 +4,7 @@ from tkinter import filedialog
 
 import darkdetect
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import SUCCESS, DANGER
+from ttkbootstrap.constants import SUCCESS, DANGER, INFO
 from ttkbootstrap.dialogs import Messagebox
 
 import config
@@ -155,7 +155,7 @@ class GUI:
 
         # Status label
         status_label = ttk.Label(
-            mainframe, textvariable=self.status, font=("Segoe UI", 10)
+            mainframe, textvariable=self.status, font=("Segoe UI", 10), style=INFO
         )
         status_label.grid(row=7, column=0, sticky="w", pady=(10, 0))
 
