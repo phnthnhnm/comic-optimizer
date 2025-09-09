@@ -1,4 +1,5 @@
 import threading
+import tkinter as tk  # Add for Text/Scrollbar widgets
 from tkinter import filedialog
 
 import darkdetect
@@ -21,32 +22,6 @@ class GUI:
     def set_status(self, message: str) -> None:
         self.root.after(0, self.status.set, message)
 
-    def show_info(self, message: str, title: str = "Done") -> None:
-        import tkinter as tk
-
-        def show_custom_dialog():
-            dialog = tk.Toplevel(self.root)
-            dialog.title(title)
-            dialog.geometry("700x400")
-            dialog.resizable(True, True)
-            # Frame for padding
-            frame = ttk.Frame(dialog, padding=15)
-            frame.pack(fill="both", expand=True)
-            # Text widget for report
-            text = ttk.Text(frame, wrap="word", font=("Segoe UI", 10))
-            text.insert("1.0", message)
-            text.config(state="disabled")
-            text.pack(fill="both", expand=True)
-            # OK button
-            ok_btn = ttk.Button(frame, text="OK", command=dialog.destroy, width=10)
-            ok_btn.pack(pady=10)
-            # Focus and modal
-            dialog.transient(self.root)
-            dialog.grab_set()
-            dialog.focus_set()
-
-        self.root.after(0, lambda *args: show_custom_dialog())
-
     def show_error(self, message: str, title: str = "Error") -> None:
         self.root.after(0, lambda *args: Messagebox.show_error(message, title=title))
 
@@ -62,7 +37,7 @@ class GUI:
         self.preset_content = None
         self.root = root
         self.root.title("Comic Optimizer")
-        self.root.geometry("500x330")
+        self.root.geometry("900x400")  # Wider for report panel
         self.root.resizable(True, True)
 
         # Settings menu
@@ -83,11 +58,20 @@ class GUI:
         self.skip_pingo = ttk.BooleanVar(value=False)
         self.status = ttk.StringVar(value="Idle.")
         self.output_extension = ttk.StringVar(value=".cbz")
+        self.report_text = None  # Initialize here to avoid warning
         self.create_widgets()
 
     def create_widgets(self) -> None:
-        mainframe = ttk.Frame(self.root, padding=20)
-        mainframe.pack(fill="both", expand=True)
+        # Main horizontal frame
+        container = ttk.Frame(self.root)
+        container.pack(fill="both", expand=True)
+        container.columnconfigure(0, weight=1)
+        container.columnconfigure(1, weight=2)
+        container.rowconfigure(0, weight=1)
+
+        # Left: main controls
+        mainframe = ttk.Frame(container, padding=20)
+        mainframe.grid(row=0, column=0, sticky="nsew")
 
         # Warning label
         warning_label = ttk.Label(
@@ -178,6 +162,19 @@ class GUI:
         # Update preset content when selection changes
         preset_combo.bind("<<ComboboxSelected>>", self._on_preset_change)
 
+        # Right: live pingo report panel
+        report_frame = ttk.Frame(container, padding=10)
+        report_frame.grid(row=0, column=1, sticky="nsew")
+        report_label = ttk.Label(report_frame, text="Pingo Report Output", font=("Segoe UI", 11, "bold"))
+        report_label.pack(anchor="w")
+        # Use native tkinter Text for better control
+        self.report_text = tk.Text(report_frame, wrap="word", font=("Segoe UI", 10), state="disabled", height=20,
+                                   width=60)
+        self.report_text.pack(fill="both", expand=True, side="left")
+        report_scroll = ttk.Scrollbar(report_frame, orient="vertical", command=self.report_text.yview)
+        report_scroll.pack(side="right", fill="y")
+        self.report_text["yscrollcommand"] = report_scroll.set
+
     def _get_preset_content(self, preset_name: str) -> str:
         cmd = self.preset_dict.get(preset_name, [])
         return (
@@ -195,31 +192,76 @@ class GUI:
             self.user_settings["last_root_dir"] = path
             save_user_settings(self.user_settings)
 
+    def clear_report(self):
+        self.report_text.config(state="normal")
+        self.report_text.delete("1.0", tk.END)
+        self.report_text.config(state="disabled")
+
+    def append_report(self, text):
+        def _append():
+            self.report_text.config(state="normal")
+            self.report_text.insert(tk.END, text + "\n\n")
+            self.report_text.see(tk.END)
+            self.report_text.config(state="disabled")
+
+        self.root.after(0, _append)
+
     def start_processing(self) -> None:
         """Start the processing in a background thread."""
         if not self.dir_path.get():
             Messagebox.show_error("Please select a directory.", title="Error")
             return
+        self.clear_report()  # Clear report at start
         threading.Thread(target=self.run_processing_thread, daemon=True).start()
+
+    def _process_and_report_folder(self, folder_path, zip_file_path, status_callback, report_callback, pingo_outputs):
+        status_callback(f"Processing\n{core.os.path.basename(folder_path)}")
+        pingo_output = core.process_single_folder(
+            folder_path,
+            zip_file_path,
+            self.selected_preset.get(),
+            self.skip_pingo.get(),
+            self.preset_dict
+        )
+        if pingo_output:
+            report_callback(core.os.path.basename(folder_path), pingo_output)
+            pingo_outputs.append(f"{core.os.path.basename(folder_path)}:\n{pingo_output}")
 
     def run_processing_thread(self) -> None:
         """Thread target: call core.process_root_directory and update GUI."""
         root_dir = self.dir_path.get()
         output_ext = self.output_extension.get()
         try:
-            pingo_outputs = core.process_root_directory(
-                root_dir,
-                output_ext,
-                self.selected_preset.get(),
-                self.skip_pingo.get(),
-                self.preset_dict,
-                status_callback=self.set_status
-            )
+            # Custom callback to update report live
+            def status_callback(msg):
+                self.set_status(msg)
+
+            def report_callback(folder, pingo_output):
+                if pingo_output:
+                    self.append_report(f"{folder}:\n{pingo_output}")
+
+            # Wrap process_root_directory to call report_callback after each folder
+            pingo_outputs = []
+            for item in core.os.listdir(root_dir):
+                item_path = core.os.path.join(root_dir, item)
+                if core.os.path.isdir(item_path):
+                    subfolders = [
+                        core.os.path.join(item_path, subfolder)
+                        for subfolder in core.os.listdir(item_path)
+                        if core.os.path.isdir(core.os.path.join(item_path, subfolder))
+                    ]
+                    if subfolders:
+                        for subfolder in subfolders:
+                            zip_file_path = core.os.path.join(
+                                item_path, f"{core.os.path.basename(subfolder)}{output_ext}"
+                            )
+                            self._process_and_report_folder(subfolder, zip_file_path, status_callback, report_callback,
+                                                            pingo_outputs)
+                    else:
+                        zip_file_path = core.os.path.join(root_dir, f"{item}{output_ext}")
+                        self._process_and_report_folder(item_path, zip_file_path, status_callback, report_callback,
+                                                        pingo_outputs)
             self.set_status("Done!")
-            output_message = (
-                "\n\n".join(pingo_outputs) if pingo_outputs else "Processing complete!"
-            )
-            self.show_info(output_message, title="Done")
         except Exception as e:
             self.set_status(f"Error: {e}")
             self.show_error(str(e), title="Error")
