@@ -77,7 +77,7 @@ def safe_remove_folder(item_path: str) -> None:
     except Exception:
         try:
             os.rmdir(item_path)
-        except Exception:
+        except OSError:
             shutil.rmtree(item_path, ignore_errors=True)
 
 
