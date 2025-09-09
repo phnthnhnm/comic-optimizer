@@ -1,7 +1,10 @@
+import logging
 import os
 import sys
 
 import toml
+
+logger = logging.getLogger(__name__)
 
 
 def get_user_config_dir():
@@ -44,7 +47,8 @@ def load_user_settings():
             if k != 'presets':
                 settings[k] = data.get(k, v)
         return settings
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to load user settings: {e}")
         save_user_settings(DEFAULT_SETTINGS)
         return DEFAULT_SETTINGS.copy()
 
@@ -54,5 +58,5 @@ def save_user_settings(settings):
         os.makedirs(USER_CONFIG_DIR, exist_ok=True)
         with open(SETTINGS_FILE, 'w', encoding='utf-8') as f:
             toml.dump(settings, f)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Failed to save user settings: {e}")
